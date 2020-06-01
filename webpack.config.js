@@ -1,13 +1,19 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-var SRC_DIR = path.resolve(__dirname, 'src');
+// const HtmlWebPackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = () => {
   const CSSExtract = new ExtractTextPlugin('styles.css');
 
   return {
     entry: './src/app.js',
+    devtool: 'source-map',
+    devServer: {
+      contentBase: path.join(__dirname, 'public'),
+      historyApiFallback: true,
+      publicPath: '/dist/',
+    },
     output: {
       path: path.join(__dirname, 'public', 'dist'),
       filename: 'bundle.js',
@@ -17,7 +23,7 @@ module.exports = () => {
         {
           loader: 'babel-loader',
           test: /\.jsx?$/,
-          include: SRC_DIR,
+          exclude: /node_modules/,
           query: {
             presets: ['react', 'es2015', 'stage-2'],
           },
@@ -43,12 +49,9 @@ module.exports = () => {
         },
       ],
     },
-    plugins: [CSSExtract],
-    devtool: 'source-map',
-    devServer: {
-      contentBase: path.join(__dirname, 'public'),
-      historyApiFallback: true,
-      publicPath: '/dist/',
-    },
+    plugins: [
+      CSSExtract,
+      new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+    ],
   };
 };
